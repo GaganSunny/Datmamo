@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Clinic Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial
+        }
+
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f1f5f9;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 240px;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 10px
+        }
+
+        .sidebar button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            text-align: left;
+            width: 100%;
+        }
+
+        .sidebar button:hover {
+            background: #1e293b
+        }
+
+        /* MAIN */
+
+        .main {
+            flex: 1;
+            padding: 25px;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            overflow: auto;
+        }
+
+        .section {
+            display: none
+        }
+
+        .section.active {
+            display: block
+        }
+
+        /* INPUT */
+
+        input,
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin: 5px;
+            min-width: 120px
+        }
+
+        /* BUTTONS */
+
+        .add-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 9px 14px;
+            border-radius: 6px;
+            cursor: pointer
+        }
+
+        .small {
+            padding: 5px 8px;
+            font-size: 12px
+        }
+
+        .delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 5px;
+            cursor: pointer
+        }
+
+        /* TABLE */
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px
+        }
+
+        table {
+            min-width: 650px;
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left
+        }
+
+        th {
+            background: #2563eb;
+            color: white
+        }
+
+        /* MODAL */
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 10px
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 10px;
+            max-height: 90vh;
+            overflow: auto
+        }
+
+        .feedback-item {
+            background: #f1f5f9;
+            padding: 6px;
+            margin: 4px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        /* NOTES */
+
+        .notes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px
+        }
+
+        .note {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            width: 260px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column
+        }
+
+        .note input {
+            width: 100%;
+            font-weight: bold
+        }
+
+        .note textarea {
+            width: 100%;
+            height: 80px;
+            margin-top: 5px;
+            resize: none
+        }
+
+        /* ===== MOBILE / TABLET ===== */
+
+        @media (max-width:768px) {
+
+            body {
+                flex-direction: column;
+            }
+
+            /* sidebar becomes top navbar */
+
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 8px;
+            }
+
+            .sidebar h2 {
+                display: none;
+            }
+
+            .sidebar button {
+                flex: 0 0 auto;
+                min-width: 110px;
+                text-align: center;
+                background: #1e293b;
+            }
+
+            /* main full width */
+
+            .main {
+                margin: 0;
+                border-radius: 0;
+                width: 100%;
+                padding: 15px;
+            }
+
+            /* inputs stack */
+
+            #clients input,
+            #newclient input,
+            #send input,
+            #review input {
+                width: 100%;
+                display: block;
+                margin: 6px 0;
+            }
+
+            /* button full width */
+
+            .add-btn {
+                width: 100%;
+            }
+
+            /* notes */
+
+            .note {
+                width: 100%;
+            }
+
+            /* table scroll */
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div class="sidebar">
+
+        <h2>Clinic</h2>
+
+        <button onclick="showSection('clients')">Clients</button>
+        <button onclick="showSection('send')">Send Medicine</button>
+        <button onclick="showSection('newclient')">New Clients</button>
+        <button onclick="showSection('review')">Review</button>
+        <button onclick="showSection('remind')">Remind</button>
+
+    </div>
+
+
+    <div class="main">
+
+        <!-- CLIENTS -->
+
+        <div id="clients" class="section active">
+
+            <h2>Clients</h2>
+
+            <input id="clientSearch" placeholder="Search phone / name / disease" oninput="searchClients()">
+
+            <br>
+
+            <input id="clientName" placeholder="Name">
+            <input id="clientDisease" placeholder="Disease">
+            <input id="clientPhone" placeholder="Phone">
+
+            <button class="add-btn" onclick="addClient()">Add Client</button>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Disease</th>
+                            <th>Phone</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="clientTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- NEW CLIENTS -->
+
+        <div id="newclient" class="section">
+
+            <h2>New Clients</h2>
+
+            <input id="newSearch" placeholder="Search..." oninput="searchNewClients()">
+
+            <br>
+
+            <input id="newName" placeholder="Name">
+            <input id="newDisease" placeholder="Disease">
+            <input id="newPhone" placeholder="Phone">
+
+            <button class="add-btn" onclick="addNewClient()">Add</button>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Disease</th>
+                            <th>Phone</th>
+                            <th>Move</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="newClientTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- SEND -->
+
+        <div id="send" class="section">
+
+            <h2>Send Medicine</h2>
+
+            <input id="sendSearch" placeholder="Search..." oninput="searchSend()">
+
+            <br>
+
+            <input id="sendName" placeholder="Name">
+            <input id="sendDisease" placeholder="Disease">
+            <input id="sendPhone" placeholder="Phone">
+
+            <button class="add-btn" onclick="addSend()">Add</button>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Disease</th>
+                            <th>Phone</th>
+                            <th>Done</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="sendTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- REVIEW -->
+
+        <div id="review" class="section">
+
+            <h2>Review</h2>
+
+            <input id="reviewSearch" placeholder="Search..." oninput="searchReview()">
+
+            <br>
+
+            <input id="reviewName" placeholder="Name">
+            <input id="reviewDisease" placeholder="Disease">
+            <input id="reviewPhone" placeholder="Phone">
+
+            <button class="add-btn" onclick="addReview()">Add</button>
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Disease</th>
+                            <th>Phone</th>
+                            <th>Done</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="reviewTable"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- NOTES -->
+
+        <div id="remind" class="section">
+
+            <h2>Notes</h2>
+
+            <button class="add-btn" onclick="addNote()">Add Note</button>
+
+            <div class="notes" id="notesContainer"></div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- CLIENT MODAL -->
+
+    <div class="modal" id="clientModal">
+
+        <div class="modal-content">
+
+            <h3 id="modalTitle"></h3>
+
+            <p>
+                Address
+                <input id="clientAddress">
+            </p>
+
+            <p>
+                Status
+                <select id="clientStatus">
+                    <option>Active</option>
+                    <option>Inactive</option>
+                </select>
+            </p>
+
+            <h4>Feedback</h4>
+
+            <input type="date" id="fdate">
+            <input placeholder="Progress" id="fprogress">
+            <input placeholder="Medicine" id="fmedicine">
+
+            <button onclick="addFeedback()">Add Feedback</button>
+
+            <div id="feedbackList"></div>
+
+            <br>
+
+            <button onclick="addReviewFromClient()">Add Review</button>
+            <button onclick="addSendFromClient()">Send Medicine</button>
+            <button class="delete" onclick="deleteClient()">Delete Client</button>
+
+            <br><br>
+
+            <button onclick="closeClientModal()">Close</button>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        /* NAVIGATION */
+
+        function showSection(id) {
+            document.querySelectorAll(".section").forEach(s => s.classList.remove("active"))
+            document.getElementById(id).classList.add("active")
+        }
+
+        /* STORAGE */
+
+        let clients = JSON.parse(localStorage.getItem("clients") || "[]")
+        let newClients = JSON.parse(localStorage.getItem("newClients") || "[]")
+        let sendList = JSON.parse(localStorage.getItem("sendList") || "[]")
+        let reviewList = JSON.parse(localStorage.getItem("reviewList") || "[]")
+        let notes = JSON.parse(localStorage.getItem("notes") || "[]")
+
+        function save() {
+            localStorage.setItem("clients", JSON.stringify(clients))
+            localStorage.setItem("newClients", JSON.stringify(newClients))
+            localStorage.setItem("sendList", JSON.stringify(sendList))
+            localStorage.setItem("reviewList", JSON.stringify(reviewList))
+            localStorage.setItem("notes", JSON.stringify(notes))
+        }
+
+        /* FILTER */
+
+        function smartFilter(data, q) {
+
+            q = q.toLowerCase()
+
+            return data.filter(x => {
+
+                let p = x.phone.toLowerCase()
+                let n = x.name.toLowerCase()
+                let d = x.disease.toLowerCase()
+
+                return p.startsWith(q) || p.includes(q) ||
+                    n.startsWith(q) || n.includes(q) ||
+                    d.startsWith(q) || d.includes(q)
+
+            })
+
+        }
+
+        /* CLIENTS */
+
+        function addClient() {
+
+            clients.push({
+                name: clientName.value,
+                disease: clientDisease.value,
+                phone: clientPhone.value,
+                feedback: []
+            })
+
+            save()
+            renderClients()
+
+        }
+
+        function renderClients(data = clients) {
+
+            clientTable.innerHTML = ""
+
+            data.forEach((c, i) => {
+
+                clientTable.innerHTML += `
+<tr>
+<td>${c.name}</td>
+<td>${c.disease}</td>
+<td>${c.phone}</td>
+<td><button class="small" onclick="openClient(${i})">Options</button></td>
+</tr>
+`
+
+            })
+
+        }
+
+        function searchClients() {
+            renderClients(smartFilter(clients, clientSearch.value))
+        }
+
+        renderClients()
+
+        /* NEW CLIENTS */
+
+        function addNewClient() {
+
+            newClients.push({
+                name: newName.value,
+                disease: newDisease.value,
+                phone: newPhone.value
+            })
+
+            save()
+            renderNewClients()
+
+        }
+
+        function moveClient(i) {
+
+            clients.push(newClients[i])
+            newClients.splice(i, 1)
+
+            save()
+            renderNewClients()
+            renderClients()
+
+        }
+
+        function deleteNewClient(i) {
+
+            newClients.splice(i, 1)
+            save()
+            renderNewClients()
+
+        }
+
+        function renderNewClients(data = newClients) {
+
+            newClientTable.innerHTML = ""
+
+            data.forEach((c, i) => {
+
+                newClientTable.innerHTML += `
+<tr>
+<td>${c.name}</td>
+<td>${c.disease}</td>
+<td>${c.phone}</td>
+<td><button onclick="moveClient(${i})">Move</button></td>
+<td><button class="delete" onclick="deleteNewClient(${i})">Delete</button></td>
+</tr>
+`
+
+            })
+
+        }
+
+        function searchNewClients() {
+            renderNewClients(smartFilter(newClients, newSearch.value))
+        }
+
+        renderNewClients()
+
+        /* SEND */
+
+        function addSend() {
+
+            sendList.push({
+                name: sendName.value,
+                disease: sendDisease.value,
+                phone: sendPhone.value,
+                done: false
+            })
+
+            save()
+            renderSend()
+
+        }
+
+        function deleteSend(i) {
+
+            sendList.splice(i, 1)
+            save()
+            renderSend()
+
+        }
+
+        function renderSend(data = sendList) {
+
+            sendTable.innerHTML = ""
+
+            data.forEach((s, i) => {
+
+                sendTable.innerHTML += `
+<tr>
+<td>${s.name}</td>
+<td>${s.disease}</td>
+<td>${s.phone}</td>
+<td><input type="checkbox" ${s.done ? "checked" : ""}
+onclick="sendList[${i}].done=this.checked;save()"></td>
+<td><button class="delete" onclick="deleteSend(${i})">Delete</button></td>
+</tr>
+`
+
+            })
+
+        }
+
+        function searchSend() {
+            renderSend(smartFilter(sendList, sendSearch.value))
+        }
+
+        renderSend()
+
+        /* REVIEW */
+
+        function addReview() {
+
+            reviewList.push({
+                name: reviewName.value,
+                disease: reviewDisease.value,
+                phone: reviewPhone.value,
+                done: false
+            })
+
+            save()
+            renderReview()
+
+        }
+
+        function deleteReview(i) {
+
+            reviewList.splice(i, 1)
+            save()
+            renderReview()
+
+        }
+
+        function renderReview(data = reviewList) {
+
+            reviewTable.innerHTML = ""
+
+            data.forEach((r, i) => {
+
+                reviewTable.innerHTML += `
+<tr>
+<td>${r.name}</td>
+<td>${r.disease}</td>
+<td>${r.phone}</td>
+<td><input type="checkbox" ${r.done ? "checked" : ""}
+onclick="reviewList[${i}].done=this.checked;save()"></td>
+<td><button class="delete" onclick="deleteReview(${i})">Delete</button></td>
+</tr>
+`
+
+            })
+
+            /*************  ✨ Windsurf Command ⭐  *************/
+            /**
+             * Renders the review table based on the given data
+             * @param {Array} data - The review data to render
+             * @example renderReview(reviewList)
+             */
+            /*******  bdac622c-e03d-4997-aee3-a00250fa41ec  *******/
+        }
+
+        function searchReview() {
+            renderReview(smartFilter(reviewList, reviewSearch.value))
+        }
+
+        renderReview()
+
+        /* CLIENT OPTIONS */
+
+        let currentClient = null
+
+        function openClient(i) {
+
+            currentClient = i
+            let c = clients[i]
+
+            modalTitle.innerText = c.name
+            clientModal.style.display = "flex"
+
+            renderFeedback()
+
+        }
+
+        function closeClientModal() {
+            clientModal.style.display = "none"
+        }
+
+        function deleteClient() {
+
+            clients.splice(currentClient, 1)
+            save()
+            renderClients()
+            closeClientModal()
+
+        }
+
+        /* FEEDBACK */
+
+        function addFeedback() {
+
+            let c = clients[currentClient]
+
+            c.feedback.push({
+                date: fdate.value,
+                progress: fprogress.value,
+                medicine: fmedicine.value
+            })
+
+            save()
+            renderFeedback()
+
+        }
+
+        function renderFeedback() {
+
+            let c = clients[currentClient]
+
+            feedbackList.innerHTML = ""
+
+            c.feedback.forEach((f, i) => {
+
+                feedbackList.innerHTML += `
+<div class="feedback-item">
+${f.date} | ${f.progress} | ${f.medicine}
+<button class="delete" onclick="deleteFeedback(${i})">x</button>
+</div>
+`
+
+            })
+
+        }
+
+        function deleteFeedback(i) {
+
+            clients[currentClient].feedback.splice(i, 1)
+            save()
+            renderFeedback()
+
+        }
+
+        /* SEND FROM CLIENT */
+
+        function addSendFromClient() {
+
+            let c = clients[currentClient]
+
+            sendList.push({
+                name: c.name,
+                disease: c.disease,
+                phone: c.phone,
+                done: false
+            })
+
+            save()
+            renderSend()
+
+        }
+
+        /* REVIEW FROM CLIENT */
+
+        function addReviewFromClient() {
+
+            let c = clients[currentClient]
+
+            reviewList.push({
+                name: c.name,
+                disease: c.disease,
+                phone: c.phone,
+                done: false
+            })
+
+            save()
+            renderReview()
+
+        }
+
+        /* NOTES */
+
+        function addNote() {
+
+            notes.push({ title: "New Note", body: "" })
+            save()
+            renderNotes()
+
+        }
+
+        function renderNotes() {
+
+            notesContainer.innerHTML = ""
+
+            notes.forEach((n, i) => {
+
+                notesContainer.innerHTML += `
+<div class="note">
+<input value="${n.title}"
+oninput="notes[${i}].title=this.value;save()">
+
+<textarea
+oninput="notes[${i}].body=this.value;save()">${n.body}</textarea>
+
+<button class="delete" onclick="deleteNote(${i})">Delete</button>
+</div>
+`
+
+            })
+
+        }
+
+        function deleteNote(i) {
+
+            notes.splice(i, 1)
+            save()
+            renderNotes()
+
+        }
+
+        renderNotes()
+
+    </script>
+
+</body>
+
+</html>

@@ -2,744 +2,941 @@
 <html>
 
 <head>
-<meta charset="UTF-8">
-<title>Clinic Dashboard</title>
+    <meta charset="UTF-8">
+    <title>Clinic Dashboard</title>
 
-<style>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial;
+        }
 
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:Arial
-}
+        body {
+            display: flex;
+            min-height: 100vh;
+            background: #f1f5f9;
+            overflow-x: hidden;
+        }
 
-body{
-display:flex;
-min-height:100vh;
-background:#f1f5f9;
-overflow-x:hidden
-}
+        /* SIDEBAR */
 
-/* SIDEBAR */
+        .sidebar {
+            width: 230px;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-.sidebar{
-width:240px;
-background:#0f172a;
-color:white;
-padding:20px;
-display:flex;
-flex-direction:column;
-gap:10px
-}
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
 
-.sidebar h2{
-text-align:center
-}
+        .sidebar button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 6px;
+            text-align: left;
+        }
 
-.sidebar button{
-background:none;
-border:none;
-color:white;
-padding:10px;
-cursor:pointer;
-border-radius:6px;
-text-align:left
-}
+        .sidebar button:hover {
+            background: #1e293b;
+        }
 
-.sidebar button:hover{
-background:#1e293b
-}
+        /* MAIN */
 
-/* MAIN */
+        .main {
+            flex: 1;
+            padding: 25px;
+            background: white;
+            margin: 10px;
+            border-radius: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
 
-.main{
-flex:1;
-padding:25px;
-background:white;
-margin:10px;
-border-radius:10px;
-box-shadow:0 6px 20px rgba(0,0,0,0.1)
-}
+        .section {
+            display: none;
+        }
 
-.section{
-display:none
-}
+        .section.active {
+            display: block;
+        }
 
-.section.active{
-display:block
-}
+        /* INPUTS */
 
-/* INPUT */
+        input,
+        select,
+        textarea {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin: 4px;
+        }
 
-input,select,textarea{
-padding:10px;
-border:1px solid #ccc;
-border-radius:6px;
-margin:5px
-}
+        /* BUTTON STYLE */
 
-/* BUTTON */
+        button {
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
 
-.add-btn{
-background:#2563eb;
-color:white;
-border:none;
-padding:9px 14px;
-border-radius:6px;
-cursor:pointer
-}
+        button:hover {
+            transform: scale(1.05);
+        }
 
-.small{
-padding:5px 8px;
-font-size:12px
-}
+        .add-btn {
+            background: #2563eb;
+            color: white;
+        }
 
-.delete{
-background:#ef4444;
-color:white;
-border:none;
-padding:6px 10px;
-border-radius:5px;
-cursor:pointer
-}
+        .option-btn {
+            background: #0ea5e9;
+            color: white;
+        }
 
-/* TABLE */
+        .delete {
+            background: #ef4444;
+            color: white;
+        }
 
-.table-container{
-overflow-x:auto;
-margin-top:10px
-}
+        .small {
+            font-size: 12px;
+        }
 
-table{
-width:100%;
-border-collapse:collapse
-}
+        /* TABLE */
 
-th,td{
-padding:10px;
-border-bottom:1px solid #ddd
-}
+        .table-container {
+            overflow-x: auto;
+            margin-top: 10px;
+        }
 
-th{
-background:#2563eb;
-color:white
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
 
-/* MODAL */
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
 
-.modal{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.4);
-display:none;
-align-items:center;
-justify-content:center
-}
+        th {
+            background: #2563eb;
+            color: white;
+        }
 
-.modal-content{
-background:white;
-padding:20px;
-width:500px;
-border-radius:10px;
-max-height:90vh;
-overflow:auto
-}
+        /* STATUS COLORS */
 
-.feedback-item{
-background:#f1f5f9;
-padding:6px;
-margin:4px 0;
-border-radius:5px;
-display:flex;
-justify-content:space-between
-}
+        .pending {
+            background: #fef08a;
+        }
 
-/* REVIEW COLORS */
+        .completed {
+            background: #bbf7d0;
+        }
 
-.review-done{
-background:#bbf7d0
-}
+        /* MODAL */
 
-.review-due{
-background:#fef08a
-}
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
 
-/* MOBILE */
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 450px;
+            border-radius: 10px;
+            max-height: 90vh;
+            overflow: auto;
+        }
 
-@media(max-width:768px){
+        .feedback-item {
+            background: #f1f5f9;
+            padding: 6px;
+            margin: 4px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-body{
-flex-direction:column
-}
+        /* NOTES */
 
-.sidebar{
-width:100%;
-flex-direction:row;
-overflow-x:auto
-}
+        .note {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
 
-.sidebar h2{
-display:none
-}
+        /* MOBILE */
 
-.main{
-margin:0;
-border-radius:0
-}
+        @media(max-width:768px) {
 
-}
+            body {
+                flex-direction: column;
+            }
 
-</style>
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+
+            .sidebar h2 {
+                display: none;
+            }
+
+            .main {
+                margin: 0;
+                border-radius: 0;
+            }
+
+        }
+
+        .pending {
+            background: #fef08a;
+        }
+
+        .completed {
+            background: #bbf7d0;
+        }
+
+        .btn-pending {
+            background: #facc15;
+            color: black;
+        }
+
+        .btn-done {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-pending {
+            background: #facc15;
+            color: black;
+        }
+
+        .btn-done {
+            background: #22c55e;
+            color: white;
+        }
+
+        .option-btn {
+            background: #0ea5e9;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+
+        .delete {
+            background: #ef4444;
+            color: white;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="sidebar">
+    <div class="sidebar">
 
-<h2>Clinic</h2>
+        <h2>Clinic</h2>
 
-<button onclick="showSection('clients')">Clients</button>
-<button onclick="showSection('send')">Send Medicine</button>
-<button onclick="showSection('newclient')">New Clients</button>
-<button onclick="showSection('review')">Review</button>
-<button onclick="showSection('notes')">Notes</button>
+        <button onclick="showSection('clients')">Clients</button>
 
-</div>
+        <button onclick="showSection('newclient')">New Clients</button>
 
-<div class="main">
+        <button onclick="showSection('send')">Send Medicine</button>
 
-<!-- CLIENTS -->
+        <button onclick="showSection('review')">Review</button>
 
-<div id="clients" class="section active">
+        <button onclick="showSection('notes')">Notes</button>
 
-<h2>Clients</h2>
+    </div>
 
-<input id="clientName" placeholder="Name">
-<input id="clientDisease" placeholder="Disease">
-<input id="clientPhone" placeholder="Phone">
+    <div class="main">
 
-<button class="add-btn" onclick="addClient()">Add Client</button>
+        <!-- CLIENTS -->
 
-<div class="table-container">
+        <div id="clients" class="section active">
 
-<table>
+            <h2>Clients</h2>
 
-<thead>
-<tr>
-<th>Name</th>
-<th>Disease</th>
-<th>Phone</th>
-<th>Options</th>
-</tr>
-</thead>
+            <input id="clientName" placeholder="Name">
+            <input id="clientDisease" placeholder="Disease">
+            <input id="clientPhone" placeholder="Phone">
 
-<tbody id="clientTable"></tbody>
+            <button class="add-btn" onclick="addClient()">Add Client</button>
 
-</table>
+            <div class="table-container">
 
-</div>
+                <table>
 
-</div>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Disease</th>
+                            <th>Phone</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
 
-<!-- SEND -->
+                    <tbody id="clientTable"></tbody>
 
-<div id="send" class="section">
+                </table>
 
-<h2>Send Medicine</h2>
+            </div>
 
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Disease</th>
-<th>Phone</th>
-<th>Done</th>
-<th>Delete</th>
-</tr>
-</thead>
+        </div>
 
-<tbody id="sendTable"></tbody>
+        <!-- SEND -->
 
-</table>
+        <div id="send" class="section">
 
-</div>
+            <h2>Send Medicine</h2>
 
-<!-- NEW CLIENT -->
+            <table>
 
-<div id="newclient" class="section">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Disease</th>
+                        <th>Phone</th>
+                        <th>Options</th>
+                        <th>Done</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
 
-<h2>New Clients</h2>
+                <tbody id="sendTable"></tbody>
 
-<input id="newName" placeholder="Name">
-<input id="newDisease" placeholder="Disease">
-<input id="newPhone" placeholder="Phone">
+            </table>
 
-<button class="add-btn" onclick="addNewClient()">Add</button>
+        </div>
 
-<table>
+        <!-- REVIEW -->
 
-<thead>
-<tr>
-<th>Name</th>
-<th>Disease</th>
-<th>Phone</th>
-<th>Move</th>
-<th>Delete</th>
-</tr>
-</thead>
+        <div id="review" class="section">
 
-<tbody id="newClientTable"></tbody>
+            <h2>Review</h2>
 
-</table>
+            <table>
 
-</div>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Disease</th>
+                        <th>Phone</th>
+                        <th>Options</th>
+                        <th>Done</th>
+                        <th>Delete</th>
+                    </tr>
+                </thead>
 
-<!-- REVIEW -->
+                <tbody id="reviewTable"></tbody>
 
-<div id="review" class="section">
+            </table>
 
-<h2>Review</h2>
+        </div>
 
-<input id="reviewName" placeholder="Name">
-<input id="reviewDisease" placeholder="Disease">
-<input id="reviewPhone" placeholder="Phone">
+        <!-- NOTES -->
 
-<button class="add-btn" onclick="addReview()">Add</button>
+        <div id="notes" class="section">
 
-<table>
+            <h2>Notes</h2>
 
-<thead>
-<tr>
-<th>Name</th>
-<th>Disease</th>
-<th>Phone</th>
-<th>Done</th>
-<th>Delete</th>
-</tr>
-</thead>
+            <input id="noteTitle" placeholder="Title">
+            <br>
 
-<tbody id="reviewTable"></tbody>
+            <textarea id="noteBody" placeholder="Write note..." rows="4"></textarea>
 
-</table>
+            <br>
 
-</div>
+            <button class="add-btn" onclick="addNote()">Add Note</button>
 
-<!-- NOTES -->
+            <div id="notesContainer"></div>
 
-<div id="notes" class="section">
+        </div>
+        <div id="newclient" class="section">
 
-<h2>Notes</h2>
+            <h2>New Clients</h2>
 
-<button class="add-btn" onclick="addNote()">Add Note</button>
+            <input id="newName" placeholder="Name">
+            <input id="newDisease" placeholder="Disease">
+            <input id="newPhone" placeholder="Phone">
 
-<div id="notesContainer"></div>
+            <button class="add-btn" onclick="addNewClient()">Add</button>
 
-</div>
+            <div class="table-container">
 
-</div>
+                <table>
 
-<!-- CLIENT MODAL -->
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Disease</th>
+                            <th>Phone</th>
+                            <th>Move</th>
+                            <th>Options</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
 
-<div class="modal" id="clientModal">
+                    <tbody id="newClientTable"></tbody>
 
-<div class="modal-content">
+                </table>
 
-<h3 id="modalTitle"></h3>
+            </div>
 
-<h4>Status</h4>
+        </div>
 
-<select id="clientStatus">
-<option>Active</option>
-<option>Inactive</option>
-</select>
+    </div>
 
-<h4>Address</h4>
+    <!-- CLIENT MODAL -->
 
-<textarea id="clientAddress" rows="3" style="width:100%"></textarea>
+    <div class="modal" id="clientModal">
 
-<h4>Report</h4>
+        <div class="modal-content">
 
-<textarea id="clientReport" rows="4" style="width:100%"></textarea>
+            <h3 id="modalTitle"></h3>
 
-<hr>
+            <h4>Status</h4>
+            <select id="clientStatus">
+                <option>Active</option>
+                <option>Inactive</option>
+            </select>
 
-<h4>Feedback</h4>
+            <h4>Address</h4>
+            <textarea id="clientAddress" rows="2"></textarea>
 
-<input type="date" id="fdate">
+            <h4>Report</h4>
+            <textarea id="clientReport" rows="3"></textarea>
 
-<textarea id="fprogress" placeholder="Progress" rows="2"></textarea>
+            <hr>
 
-<textarea id="fmedicine" placeholder="Medicines" rows="2"></textarea>
+            <h4>Feedback</h4>
 
-<button onclick="addFeedback()">Add Feedback</button>
+            <input type="date" id="fdate">
 
-<div id="feedbackList"></div>
+            <textarea id="fprogress" placeholder="Progress"></textarea>
 
-<hr>
+            <textarea id="fmedicine" placeholder="Medicines"></textarea>
 
-<button onclick="addReviewFromClient()">Add Review</button>
-<button onclick="addSendFromClient()">Send Medicine</button>
+            <button class="add-btn" onclick="addFeedback()">Add Feedback</button>
 
-<br><br>
+            <div id="feedbackList"></div>
 
-<div style="display:flex;justify-content:space-between">
+            <hr>
 
-<button onclick="closeClientModal()">Close</button>
+            <button id="sendBtn" class="btn-pending" onclick="toggleSend()">Send Medicine</button>
+            <button id="reviewBtn" class="btn-pending" onclick="toggleReview()">Add Review</button>
 
-<button class="delete" onclick="deleteClient()">Delete Client</button>
+            <br><br>
 
-</div>
+            <div style="display:flex;justify-content:space-between">
 
-</div>
+                <button onclick="closeClientModal()">Close</button>
 
-</div>
+                <button class="delete" onclick="deleteClient()">Delete Client</button>
 
-<script>
+            </div>
 
-/* NAV */
+        </div>
 
-function showSection(id){
-document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"))
-document.getElementById(id).classList.add("active")
-}
+    </div>
 
-/* STORAGE */
+    <script>
+        /* NAV */
 
-let clients=JSON.parse(localStorage.getItem("clients")||"[]")
-let newClients=JSON.parse(localStorage.getItem("newClients")||"[]")
-let sendList=JSON.parse(localStorage.getItem("sendList")||"[]")
-let reviewList=JSON.parse(localStorage.getItem("reviewList")||"[]")
-let notes=JSON.parse(localStorage.getItem("notes")||"[]")
+        function showSection(id) {
+            document.querySelectorAll(".section").forEach(s => s.classList.remove("active"))
+            document.getElementById(id).classList.add("active")
+        }
 
-function save(){
-localStorage.setItem("clients",JSON.stringify(clients))
-localStorage.setItem("newClients",JSON.stringify(newClients))
-localStorage.setItem("sendList",JSON.stringify(sendList))
-localStorage.setItem("reviewList",JSON.stringify(reviewList))
-localStorage.setItem("notes",JSON.stringify(notes))
-}
+        /* STORAGE */
 
-/* CLIENT */
+        let clients = JSON.parse(localStorage.getItem("clients") || "[]")
+        let sendList = JSON.parse(localStorage.getItem("sendList") || "[]")
+        let reviewList = JSON.parse(localStorage.getItem("reviewList") || "[]")
+        let notes = JSON.parse(localStorage.getItem("notes") || "[]")
+        let newClients = JSON.parse(localStorage.getItem("newClients") || "[]")
 
-function addClient(){
+        function save() {
+            localStorage.setItem("clients", JSON.stringify(clients))
+            localStorage.setItem("sendList", JSON.stringify(sendList))
+            localStorage.setItem("reviewList", JSON.stringify(reviewList))
+            localStorage.setItem("notes", JSON.stringify(notes))
+            localStorage.setItem("newClients", JSON.stringify(newClients))
+        }
 
-clients.push({
-name:clientName.value,
-disease:clientDisease.value,
-phone:clientPhone.value,
-status:"Active",
-address:"",
-report:"",
-feedback:[]
-})
+        /* CLIENTS */
 
-save()
-renderClients()
+        function addClient() {
 
-}
+            clients.push({
+                name: clientName.value,
+                disease: clientDisease.value,
+                phone: clientPhone.value,
+                status: "Active",
+                address: "",
+                report: "",
+                feedback: [],
+                medicineSent: false,
+                reviewAdded: false
+            })
 
-function renderClients(){
+            save()
+            renderClients()
 
-clientTable.innerHTML=""
+        }
 
-clients.forEach((c,i)=>{
+        function renderClients() {
 
-clientTable.innerHTML+=`
-<tr>
-<td>${c.name}</td>
-<td>${c.disease}</td>
-<td>${c.phone}</td>
-<td><button class="small" onclick="openClient(${i})">Options</button></td>
-</tr>
-`
+            clientTable.innerHTML = ""
 
-})
+            clients.forEach((c, i) => {
 
-}
-
-renderClients()
-
-/* NEW CLIENT */
-
-function addNewClient(){
-
-newClients.push({
-name:newName.value,
-disease:newDisease.value,
-phone:newPhone.value
-})
-
-save()
-renderNewClients()
-
-}
-
-function renderNewClients(){
-
-newClientTable.innerHTML=""
-
-newClients.forEach((c,i)=>{
-
-newClientTable.innerHTML+=`
+                clientTable.innerHTML += `
 <tr>
 <td>${c.name}</td>
 <td>${c.disease}</td>
 <td>${c.phone}</td>
-<td><button onclick="moveClient(${i})">Move</button></td>
-<td><button class="delete" onclick="deleteNewClient(${i})">Delete</button></td>
+<td>
+<button class="option-btn" onclick="openClient(${i})">
+Options
+</button>
+</td>
 </tr>
 `
 
-})
+            })
 
-}
+        }
 
-function moveClient(i){
-clients.push(newClients[i])
-newClients.splice(i,1)
-save()
-renderClients()
-renderNewClients()
-}
+        renderClients()
 
-function deleteNewClient(i){
-newClients.splice(i,1)
-save()
-renderNewClients()
-}
+        /* CLIENT MODAL */
 
-renderNewClients()
+        let currentClient = null
 
-/* SEND */
+        function openClient(i) {
 
-function addSendFromClient(){
+            currentClient = i
+            let c = clients[i]
 
-let c=clients[currentClient]
+            modalTitle.innerText = c.name
 
-sendList.push({
-name:c.name,
-disease:c.disease,
-phone:c.phone,
-done:false
-})
+            clientStatus.value = c.status || "Active"
+            clientAddress.value = c.address || ""
+            clientReport.value = c.report || ""
 
-save()
-renderSend()
+            updateOptionButtons()
 
-}
+            clientModal.style.display = "flex"
 
-function renderSend(){
+            renderFeedback()
 
-sendTable.innerHTML=""
+        }
 
-sendList.forEach((s,i)=>{
+        function closeClientModal() {
+            clientModal.style.display = "none"
+        }
 
-sendTable.innerHTML+=`
+        clientStatus.onchange = () => {
+            clients[currentClient].status = clientStatus.value
+            save()
+        }
+
+        clientAddress.oninput = () => {
+            clients[currentClient].address = clientAddress.value
+            save()
+        }
+
+        clientReport.oninput = () => {
+            clients[currentClient].report = clientReport.value
+            save()
+        }
+
+        /* BUTTON STATE */
+
+        function updateOptionButtons() {
+
+            let c = clients[currentClient]
+
+            if (c.medicineSent) {
+                sendBtn.className = "btn-done"
+                sendBtn.innerText = "Medicine Sent"
+            } else {
+                sendBtn.className = "btn-pending"
+                sendBtn.innerText = "Send Medicine"
+            }
+
+            if (c.reviewAdded) {
+                reviewBtn.className = "btn-done"
+                reviewBtn.innerText = "Review Added"
+            } else {
+                reviewBtn.className = "btn-pending"
+                reviewBtn.innerText = "Add Review"
+            }
+
+        }
+
+        /* SEND MEDICINE */
+
+        function toggleSend() {
+
+            let c = clients[currentClient]
+
+            c.medicineSent = !c.medicineSent
+
+            if (c.medicineSent) {
+
+                sendList.push({
+                    name: c.name,
+                    disease: c.disease,
+                    phone: c.phone,
+                    done: false
+                })
+
+            }
+
+            save()
+            renderSend()
+            updateOptionButtons()
+
+        }
+
+        /* REVIEW */
+
+        function toggleReview() {
+
+            let c = clients[currentClient]
+
+            c.reviewAdded = !c.reviewAdded
+
+            if (c.reviewAdded) {
+
+                reviewList.push({
+                    name: c.name,
+                    disease: c.disease,
+                    phone: c.phone,
+                    done: false
+                })
+
+            }
+
+            save()
+            renderReview()
+            updateOptionButtons()
+
+        }
+
+        /* SEND PAGE */
+
+        function renderSend() {
+
+            sendTable.innerHTML = ""
+
+            sendList.forEach((s, i) => {
+
+                sendTable.innerHTML += `
 <tr>
 <td>${s.name}</td>
 <td>${s.disease}</td>
 <td>${s.phone}</td>
-<td><input type="checkbox" ${s.done?"checked":""}
-onclick="sendList[${i}].done=this.checked;save()"></td>
-<td><button class="delete" onclick="deleteSend(${i})">Delete</button></td>
+
+<td>
+<button class="option-btn" onclick="openClientByName('${s.name}')">
+Options
+</button>
+</td>
+
+<td>
+<input type="checkbox"
+${s.done ? "checked" : ""}
+onclick="toggleSendDone(${i})">
+</td>
+
+<td>
+<button class="delete" onclick="deleteSend(${i})">Delete</button>
+</td>
+
 </tr>
 `
 
-})
+            })
 
-}
+        }
 
-function deleteSend(i){
-sendList.splice(i,1)
-save()
-renderSend()
-}
+        function toggleSendDone(i) {
+            sendList[i].done = !sendList[i].done
+            save()
+            renderSend()
+        }
 
-renderSend()
+        function deleteSend(i) {
+            sendList.splice(i, 1)
+            save()
+            renderSend()
+        }
 
-/* REVIEW */
+        renderSend()
 
-function addReview(){
+        /* REVIEW PAGE */
 
-reviewList.push({
-name:reviewName.value,
-disease:reviewDisease.value,
-phone:reviewPhone.value,
-done:false
-})
+        function renderReview() {
 
-save()
-renderReview()
+            reviewTable.innerHTML = ""
 
-}
+            reviewList.forEach((r, i) => {
 
-function renderReview(){
-
-reviewTable.innerHTML=""
-
-reviewList.forEach((r,i)=>{
-
-reviewTable.innerHTML+=`
-<tr class="${r.done?"review-done":"review-due"}">
+                reviewTable.innerHTML += `
+<tr>
 <td>${r.name}</td>
 <td>${r.disease}</td>
 <td>${r.phone}</td>
-<td><input type="checkbox" ${r.done?"checked":""}
-onclick="reviewList[${i}].done=this.checked;save();renderReview()"></td>
-<td><button class="delete" onclick="deleteReview(${i})">Delete</button></td>
+
+<td>
+<button class="option-btn" onclick="openClientByName('${r.name}')">
+Options
+</button>
+</td>
+
+<td>
+<input type="checkbox"
+${r.done ? "checked" : ""}
+onclick="toggleReviewDone(${i})">
+</td>
+
+<td>
+<button class="delete" onclick="deleteReview(${i})">Delete</button>
+</td>
+
 </tr>
 `
 
-})
+            })
 
-}
+        }
 
-function deleteReview(i){
-reviewList.splice(i,1)
-save()
-renderReview()
-}
+        function toggleReviewDone(i) {
+            reviewList[i].done = !reviewList[i].done
+            save()
+            renderReview()
+        }
 
-renderReview()
+        function deleteReview(i) {
+            reviewList.splice(i, 1)
+            save()
+            renderReview()
+        }
 
-/* CLIENT MODAL */
+        renderReview()
 
-let currentClient=null
+        /* OPEN CLIENT BY NAME */
 
-function openClient(i){
+        function openClientByName(name) {
 
-currentClient=i
-let c=clients[i]
+            let index = clients.findIndex(c => c.name === name)
 
-modalTitle.innerText=c.name
-clientStatus.value=c.status
-clientAddress.value=c.address
-clientReport.value=c.report
+            if (index !== -1) {
+                openClient(index)
+            }
 
-clientModal.style.display="flex"
+        }
 
-renderFeedback()
+        /* FEEDBACK */
 
-}
+        function addFeedback() {
 
-function closeClientModal(){
-clientModal.style.display="none"
-}
+            let c = clients[currentClient]
 
-clientStatus.onchange=()=>{
-clients[currentClient].status=clientStatus.value
-save()
-}
+            c.feedback.push({
+                date: fdate.value,
+                progress: fprogress.value,
+                medicine: fmedicine.value
+            })
 
-clientAddress.oninput=()=>{
-clients[currentClient].address=clientAddress.value
-save()
-}
+            save()
+            renderFeedback()
 
-clientReport.oninput=()=>{
-clients[currentClient].report=clientReport.value
-save()
-}
+        }
 
-function deleteClient(){
+        function renderFeedback() {
 
-clients.splice(currentClient,1)
+            let c = clients[currentClient]
 
-save()
-renderClients()
+            feedbackList.innerHTML = ""
 
-closeClientModal()
+            c.feedback.forEach((f, i) => {
 
-}
-
-/* FEEDBACK */
-
-function addFeedback(){
-
-let c=clients[currentClient]
-
-c.feedback.push({
-date:fdate.value,
-progress:fprogress.value,
-medicine:fmedicine.value
-})
-
-save()
-renderFeedback()
-
-}
-
-function renderFeedback(){
-
-let c=clients[currentClient]
-
-feedbackList.innerHTML=""
-
-c.feedback.forEach((f,i)=>{
-
-feedbackList.innerHTML+=`
+                feedbackList.innerHTML += `
 <div class="feedback-item">
 ${f.date} | ${f.progress} | ${f.medicine}
 <button class="delete" onclick="deleteFeedback(${i})">x</button>
 </div>
 `
 
-})
+            })
 
-}
+        }
 
-function deleteFeedback(i){
+        function deleteFeedback(i) {
+            clients[currentClient].feedback.splice(i, 1)
+            save()
+            renderFeedback()
+        }
 
-clients[currentClient].feedback.splice(i,1)
+        /* NOTES */
 
-save()
-renderFeedback()
+        function addNote() {
 
-}
+            notes.push({
+                title: noteTitle.value,
+                body: noteBody.value
+            })
 
-/* NOTES */
+            noteTitle.value = ""
+            noteBody.value = ""
 
-function addNote(){
+            save()
+            renderNotes()
 
-notes.push({title:"Note",body:""})
-save()
-renderNotes()
+        }
 
-}
+        function renderNotes() {
 
-function renderNotes(){
+            notesContainer.innerHTML = ""
 
-notesContainer.innerHTML=""
+            notes.forEach((n, i) => {
 
-notes.forEach((n,i)=>{
+                notesContainer.innerHTML += `
+<div class="note">
 
-notesContainer.innerHTML+=`
-<div style="background:#f8fafc;padding:15px;margin:10px;border-radius:8px">
-<input value="${n.title}"
-oninput="notes[${i}].title=this.value;save()">
-<textarea
-oninput="notes[${i}].body=this.value;save()">${n.body}</textarea>
+<h4>${n.title}</h4>
+<p>${n.body}</p>
+
 <button class="delete" onclick="deleteNote(${i})">Delete</button>
+
 </div>
 `
 
-})
+            })
 
-}
+        }
 
-function deleteNote(i){
-notes.splice(i,1)
-save()
-renderNotes()
-}
+        function deleteNote(i) {
+            notes.splice(i, 1)
+            save()
+            renderNotes()
+        }
 
-renderNotes()
+        renderNotes()
 
-</script>
+        /* NEW CLIENTS */
+
+        function addNewClient() {
+
+            newClients.push({
+                name: newName.value,
+                disease: newDisease.value,
+                phone: newPhone.value
+            })
+
+            save()
+            renderNewClients()
+
+        }
+
+        function renderNewClients() {
+
+            newClientTable.innerHTML = ""
+
+            newClients.forEach((c, i) => {
+
+                newClientTable.innerHTML += `
+<tr>
+<td>${c.name}</td>
+<td>${c.disease}</td>
+<td>${c.phone}</td>
+
+<td>
+<button onclick="moveClient(${i})">Move</button>
+</td>
+
+<td>
+<button class="option-btn" onclick="openNewClientOptions(${i})">
+Options
+</button>
+</td>
+
+<td>
+<button class="delete" onclick="deleteNewClient(${i})">Delete</button>
+</td>
+
+</tr>
+`
+
+            })
+
+        }
+
+        function moveClient(i) {
+
+            clients.push({
+                ...newClients[i],
+                status: "Active",
+                address: "",
+                report: "",
+                feedback: [],
+                medicineSent: false,
+                reviewAdded: false
+            })
+
+            newClients.splice(i, 1)
+
+            save()
+
+            renderNewClients()
+            renderClients()
+
+        }
+
+        function deleteNewClient(i) {
+            newClients.splice(i, 1)
+            save()
+            renderNewClients()
+        }
+
+        function openNewClientOptions(i) {
+            modalTitle.innerText = newClients[i].name
+            clientModal.style.display = "flex"
+        }
+
+        renderNewClients()
+    </script>
 
 </body>
+
 </html>
+```

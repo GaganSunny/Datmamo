@@ -510,6 +510,7 @@
             <hr>
 
             <button id="sendBtn" class="btn-pending" onclick="toggleSend()">Send Medicine</button>
+            <br><br>
             <button id="reviewBtn" class="btn-pending" onclick="toggleReview()">Add Review</button>
 
             <br><br>
@@ -657,7 +658,21 @@
         }
 
         function closeClientModal() {
+
+            if (currentClient !== null) {
+
+                let c = clients[currentClient]
+
+                c.status = clientStatus.value
+                c.address = clientAddress.value
+                c.report = clientReport.value
+
+                save()
+
+            }
+
             clientModal.style.display = "none"
+
         }
 
         function deleteClient() {
